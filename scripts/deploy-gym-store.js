@@ -20,16 +20,16 @@ async function main() {
     await deployer.getAddress()
   );
 
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  console.log("Account balance of the deploying account:", (await deployer.getBalance()).toString());
 
-  const Token = await ethers.getContractFactory("Token");
-  const token = await Token.deploy();
-  await token.deployed();
+  const gymStore = await ethers.getContractFactory("GymStoreNFT");
+  const storeTkn = await gymStore.deploy();
+  await storeTkn.deployed();
 
-  console.log("Token address:", token.address);
+  console.log("Store Token address:", storeTkn.address);
 
   // We also save the contract's artifacts and address in the frontend directory
-  saveFrontendFiles(token);
+  saveFrontendFiles(storeTkn);
 }
 
 function saveFrontendFiles(token) {
@@ -41,14 +41,14 @@ function saveFrontendFiles(token) {
   }
 
   fs.writeFileSync(
-    path.join(contractsDir, "contract-address.json"),
+    path.join(contractsDir, "gym-store-contract-address.json"),
     JSON.stringify({ Token: token.address }, undefined, 2)
   );
 
-  const TokenArtifact = artifacts.readArtifactSync("Token");
+  const TokenArtifact = artifacts.readArtifactSync("GymStoreNFT");
 
   fs.writeFileSync(
-    path.join(contractsDir, "Token.json"),
+    path.join(contractsDir, "gym-store-token.json"),
     JSON.stringify(TokenArtifact, null, 2)
   );
 }

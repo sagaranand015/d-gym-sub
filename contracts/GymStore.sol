@@ -23,48 +23,47 @@ contract GymStoreNFT is ERC721URIStorage {
     mapping(uint256 => storeDetails) storeMappings;
     mapping(uint256 => address) storeOwner;
     mapping(address => uint256) storeNumberMapping;
-    mapping(address => bool) hasaStore;
+    mapping(address => bool) registeredAStore;
 
     constructor() ERC721("GymStoreNFT", "GST") {
-        // create the token here
+        // create the token here. Nothing to do for now, might add something later
     }
 
-    function createBusiness(
+    function createStore(
         string memory cityName,
         string memory description,
         string memory _googleAddress,
         string memory _logo,
-        string[] memory _services
+        string[] memory _subscriptions
     ) public {
         require(
-            _PunkCities.checkRegisteredPlace(msg.sender) == true,
-            "You must be registered for Punk Cities in order to create a Business"
-        );
-        require(
-            registeredABusiness[msg.sender] == false,
-            "You already own a business"
+            registeredAStore[msg.sender] == false,
+            "You already have a store in place"
         );
         // Does one member can have only one business, or can have more?
-        businessDetails memory nextBusiness = businessDetails(
-            businesses.length,
+        // Going with only 1 store per account for now
+        uint256 sid = stores.length;
+        storeDetails memory nextStore = storeDetails(
+            sid,
             cityName,
             description,
             msg.sender,
             _googleAddress,
             _logo,
             block.timestamp,
-            _services
+            _subscriptions
         );
-        businesses.push(nextBusiness);
-        _mint(msg.sender, businessNumber);
+        stores.push(nextStore);
+        _mint(msg.sender, storeNumber);
 
-        registeredABusiness[msg.sender] = true;
-        businessNumberMapping[msg.sender] = businessNumber;
+        registeredAStore[msg.sender] = true;
+        storeNumberMapping[msg.sender] = storeNumber;
+        storeOwner[sid] = msg.sender;
 
-        businessNumber++;
+        storeNumber++;
     }
 
-    function getBusiness(uint256 _id)
+    function getStore(uint256 _id)
         public
         view
         returns (
@@ -78,27 +77,27 @@ contract GymStoreNFT is ERC721URIStorage {
         )
     {
         return (
-            businesses[_id].tokenId,
-            businesses[_id].city,
-            businesses[_id].shortDescription,
-            businesses[_id].owner,
-            businesses[_id].googleAddress,
-            businesses[_id].createdAt,
-            businesses[_id].services
+            stores[_id].tokenId,
+            stores[_id].city,
+            stores[_id].shortDescription,
+            stores[_id].owner,
+            stores[_id].googleAddress,
+            stores[_id].createdAt,
+            stores[_id].subscriptions
         );
     }
 
-    function deleteBusiness(uint256 _businessId) public {
-        require(businessOwner[_businessId] == msg.sender);
-
-        delete businessOwner[_businessId];
+    function deleteStore(uint256 _storeId) public {
+        require(storeOwner[_storeId] == msg.sender);
+        delete storeOwner[_storeId];
     }
 
-    function getBusinessId(address _address) public view returns (uint256) {
-        return businessNumberMapping[_address];
+    function getStoreId(address _address) public view returns (uint256) {
+        return storeNumberMapping[_address];
     }
 
-    /*  function listAllBusiness() public view returns(string[] memory lists){ ============> This function might not be needed as we will lists everything with Covalent probably
+    // This function might not be needed as we will lists everything with Covalent probably
+    /*  function listAllBusiness() public view returns(string[] memory lists){ 
         string[] memory _listOfBusinesses = new string[](businesses.length);
         for(uint256 i = 0; i < businesses.length; i++){
             
@@ -122,25 +121,25 @@ contract GymStoreNFT is ERC721URIStorage {
 
     }  */
 
-    function verifyBusiness(uint256 _tokenId) external {
-        require(
-            _PunkCities.checkRegisteredPlace(msg.sender) == true,
-            "You must be registered for Punk Cities in order to verify a place"
-        );
+    // function verifyBusiness(uint256 _tokenId) external {
+    //     require(
+    //         _PunkCities.checkRegisteredPlace(msg.sender) == true,
+    //         "You must be registered for Punk Cities in order to verify a place"
+    //     );
 
-        placeVerification[_tokenId]++;
-    }
+    //     placeVerification[_tokenId]++;
+    // }
 
-    function checkBusinessVerification(uint256 _tokenId)
-        public
-        view
-        returns (uint256)
-    {
-        return placeVerification[_tokenId]; // How many times this business have been verified
-    }
+    // function checkBusinessVerification(uint256 _tokenId)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     return placeVerification[_tokenId]; // How many times this business have been verified
+    // }
 
-    function ownsABusiness(address _businessOwner) public view returns (bool) {
-        return registeredABusiness[_businessOwner];
+    function ownsAStore(address _storeOWner) public view returns (bool) {
+        return registeredAStore[_storeOWner];
     }
 
     /* function listServices() public view returns(string memory) {

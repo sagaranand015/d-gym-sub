@@ -5,8 +5,8 @@ import { ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
-import TokenArtifact from "../contracts/Token.json";
-import contractAddress from "../contracts/contract-address.json";
+import TokenArtifact from "../contracts/gym-store-token.json";
+import contractAddress from "../contracts/gym-store-contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
@@ -216,6 +216,8 @@ export class Dapp extends React.Component {
     // Then, we initialize ethers, fetch the token's data, and start polling
     // for the user's balance.
 
+    console.log("User address: ", userAddress);
+
     // Fetching the token data and the user's balance are specific to this
     // sample project, but you can reuse the same initialization pattern.
     this._initializeEthers();
@@ -234,6 +236,17 @@ export class Dapp extends React.Component {
       TokenArtifact.abi,
       this._provider.getSigner(0)
     );
+
+    console.log("=========== signer is: ", this._provider.getSigner());
+    console.log("=========== signer 2 is: ", this._provider.getSigner(0));
+    console.log("=========== token is: ", this._token);
+    console.log("===== my address is: ", this.state.selectedAddress);
+
+    var storeAddrId = await this._token.getStoreId(this.state.selectedAddress);
+    console.log("store addr is: ", storeAddrId);
+
+    var storeDetails = await this._token.getStore(0);
+    console.log("store detals are: ", storeDetails);
   }
 
   // The next two methods are needed to start and stop polling data. While
@@ -360,10 +373,10 @@ export class Dapp extends React.Component {
       return true;
     }
 
-    this.setState({ 
-      networkError: 'Please connect Metamask to Localhost:8545'
-    });
+    // this.setState({ 
+    //   networkError: 'Please connect Metamask to Localhost:8545'
+    // });
 
-    return false;
+    return true;
   }
 }

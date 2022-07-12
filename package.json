@@ -29,5 +29,8 @@
     "hardhat": "^2.9.9",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.7.21"
+  },
+  "dependencies": {
+    "moralis": "^1.8.1"
   }
 }
