@@ -19,4 +19,12 @@ export default async function GetStoreContract() {
         _provider.getSigner(0)
     );
     return storeToken;
-}
+};
+
+export async function GetStoreTokenDetails(userAddress) {
+    const storeToken = await GetStoreContract();
+    const name = await storeToken.name();
+    const symbol = await storeToken.symbol();
+    const storeTokenBalance = await storeToken.balanceOf(userAddress);
+    return [name, symbol, storeTokenBalance]
+  };

@@ -5,7 +5,7 @@ import './App.css';
 import { ConnectWallet } from "./components/ConnectWallet";
 import { NoWalletDetected } from "./components/NoWalletDetected";
 import { Loading } from "./components/Loading";
-import GetStoreContract from "./scripts";
+import GetStoreContract,  { GetStoreTokenDetails } from "./scripts";
 import { GymStoreTable } from "./components/GymStore"
 
 import { TASK_COMPILE_SOLIDITY_RUN_SOLCJS } from "hardhat/builtin-tasks/task-names";
@@ -46,21 +46,28 @@ export class App extends React.Component {
     this.setState({
       selectedAddress: selectedAddress,
     }, () => {
-      console.log("===== final state:", this.state);
+      // initialize store contract and store token details
+      this._initialiseStoreTokenDetails();
     });
 
-    await this._initialiseStoreTokenDetails();
   }
 
   async _initialiseStoreTokenDetails() {
-    const storeToken = await GetStoreContract();
-    const name = await storeToken.name();
-    const symbol = await storeToken.symbol();
-    const storeTokenBalance = await storeToken.balanceOf(this.state.selectedAddress);
+    const storeContract = await GetStoreContract();
+    const [name, symbol, storeTokenBalance] = await GetStoreTokenDetails(this.state.selectedAddress);
+    this.setState({ storeContact: storeContract,  storeTokenData: { name, symbol}, storeTokenBalance: storeTokenBalance.toNumber()});
+  }
 
-    console.log("======== storeTokenBalance", storeTokenBalance.toString());
-
-    this.setState({ storeToken: storeToken,  storeTokenData: { name, symbol}, storeTokenBalance: storeTokenBalance.toNumber()});
+  async _refreshStoreTokenBalance() {
+    if(!this.state.storeContact || !this.state.storeTokenData) {
+      console.log("No Store Tokens associated with the account...");
+      return;
+    }
+    const storeTokenBalance = await this.state.storeContact.balanceOf(this.state.selectedAddress);
+    this.setState({
+      storeTokenBalance: storeTokenBalance.toNumber()
+    });
+    return this.state.storeTokenBalance;
   }
 
   render() {
@@ -83,7 +90,7 @@ export class App extends React.Component {
       );
     }
 
-    if(!this.state.storeToken || !this.state.storeTokenData) {
+    if(!this.state.storeContact || !this.state.storeTokenData) {
       return (
         <Loading />
       )
@@ -91,7 +98,7 @@ export class App extends React.Component {
 
     return (
       <div id="wrapper">  
-        <GymStoreTable allState={this.state} storeTokenData={this.state.storeTokenData} />
+        <GymStoreTable allState={this.state} storeTokenData={this.state.storeTokenData} refreshBalance={() => this._refreshStoreTokenBalance()}/>
       </div>
     );
 
