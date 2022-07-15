@@ -5,10 +5,12 @@ import './App.css';
 import { ConnectWallet } from "./components/ConnectWallet";
 import { NoWalletDetected } from "./components/NoWalletDetected";
 import { Loading } from "./components/Loading";
-import GetStoreContract,  { GetStoreTokenDetails } from "./scripts";
+import GetStoreContract,  { GetStoreTokenDetails, CreateStoreNFT } from "./gymStores";
 import { GymStoreTable } from "./components/GymStore"
 
 import { TASK_COMPILE_SOLIDITY_RUN_SOLCJS } from "hardhat/builtin-tasks/task-names";
+import { GetStoreSubscriptionContract, GetStoreSubscriptionTokenDetails } from "./storeSubscriptions";
+import { StoreSubscriptionTable } from "./components/StoreSubsciption";
 
 export class App extends React.Component {
   constructor(props) {
@@ -48,6 +50,8 @@ export class App extends React.Component {
     }, () => {
       // initialize store contract and store token details
       this._initialiseStoreTokenDetails();
+      this._initialiseStoresubscriptionTokenDetails();
+      this._refreshAllTokenBalances();
     });
 
   }
@@ -58,9 +62,24 @@ export class App extends React.Component {
     this.setState({ storeContact: storeContract,  storeTokenData: { name, symbol}, storeTokenBalance: storeTokenBalance.toNumber()});
   }
 
+  async _initialiseStoresubscriptionTokenDetails() {
+    const subContract = await GetStoreSubscriptionContract();
+    const [name, symbol, subTokenBalance] = await GetStoreSubscriptionTokenDetails(this.state.selectedAddress);
+    this.setState({ subscriptionContract: subContract,  subscriptionTokenData: { name, symbol}, subscriptionTokenBalance: subTokenBalance.toNumber()});
+  }
+
+  async _refreshAllTokenBalances() {
+    await this._refreshStoreTokenBalance();
+    await this._refreshStoresubscriptionTokenBalance();
+  }
+
   async _refreshStoreTokenBalance() {
-    if(!this.state.storeContact || !this.state.storeTokenData) {
-      console.log("No Store Tokens associated with the account...");
+    if(!this.state.selectedAddress) {
+      console.log("No Address, connect wallet please...");
+      return;
+    }
+    else if(!this.state.storeContact || !this.state.storeTokenData) {
+      console.log("No Store Contract or token connected, please try again...");
       return;
     }
     const storeTokenBalance = await this.state.storeContact.balanceOf(this.state.selectedAddress);
@@ -68,6 +87,27 @@ export class App extends React.Component {
       storeTokenBalance: storeTokenBalance.toNumber()
     });
     return this.state.storeTokenBalance;
+  }
+
+  async _refreshStoresubscriptionTokenBalance() {
+    if(!this.state.selectedAddress) {
+      console.log("No Address, connect wallet please...");
+      return;
+    }
+    else if(!this.state.subscriptionContract || !this.state.subscriptionTokenData) {
+      console.log("No Store subscription Contract or token connected, please try again...");
+      return;
+    }
+    const subTokenBalance = await this.state.subscriptionContract.balanceOf(this.state.selectedAddress);
+    this.setState({
+      subscriptionTokenBalance: subTokenBalance.toNumber()
+    });
+    return this.state.subscriptionTokenBalance;
+  }
+
+  async _createStoreNft() {
+    const tx = await CreateStoreNFT("Bangalore", "MyStore02", "http://google.com", "http://image.com");
+    await this._refreshStoreTokenBalance();
   }
 
   render() {
@@ -90,7 +130,7 @@ export class App extends React.Component {
       );
     }
 
-    if(!this.state.storeContact || !this.state.storeTokenData) {
+    if(!this.state.storeContact && !this.state.storeTokenData) {
       return (
         <Loading />
       )
@@ -98,7 +138,15 @@ export class App extends React.Component {
 
     return (
       <div id="wrapper">  
-        <GymStoreTable allState={this.state} storeTokenData={this.state.storeTokenData} refreshBalance={() => this._refreshStoreTokenBalance()}/>
+        <GymStoreTable 
+            allState={this.state} 
+            storeTokenData={this.state.storeTokenData} 
+            refreshBalance={() => this._refreshStoreTokenBalance()}
+            createStoreNFT={() => this._createStoreNft()} />
+
+        <StoreSubscriptionTable 
+            allState={this.state} />
+
       </div>
     );
 

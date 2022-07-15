@@ -1,17 +1,16 @@
 import Button from 'react-bootstrap/esm/Button';
 import Table from 'react-bootstrap/Table';
 
-import {CreateStoreNFT} from '../gymStores'
+// import {GetStoreSubscriptionContract, GetStoreSubscriptionTokenDetails} from '../storeSubscriptions'
 
-export function GymStoreTable({allState, storeTokenData, refreshBalance, createStoreNFT}) {
-
-  if(!allState.storeTokenBalance) {
+export function StoreSubscriptionTable({allState, refreshBalance, createSubscriptionNft}) {
+  if(!allState.subscriptionTokenBalance) {
     return (
       <div className='container'>
         <h3 className='header' >
-          Oops! No Store NFT yet. Go create one!
+          Oops! No Subscription NFT yet. Go create one!
         </h3>
-        <Button variant='primary' size='lg' onClick={createStoreNFT} >Create Store NFT Now!</Button>
+        <Button variant='primary' size='lg' onClick={createSubscriptionNft} >Create Subscription NFT Now!</Button>
       </div>
     );
   }
@@ -19,7 +18,7 @@ export function GymStoreTable({allState, storeTokenData, refreshBalance, createS
     return (
       <div className='container'>
         <h1 className='header'>
-          You have the Store NFT!
+          Congrats! You have the Subscription NFT!
         </h1>
         <Table striped bordered hover>
           <thead>
@@ -30,8 +29,8 @@ export function GymStoreTable({allState, storeTokenData, refreshBalance, createS
           </thead>
           <tbody>
             <tr>
-              <td>{storeTokenData.name}</td>
-              <td>{storeTokenData.symbol}</td>
+              <td>{allState.subscriptionTokenData.name}</td>
+              <td>{allState.subscriptionTokenData.symbol}</td>
             </tr>
             <tr>
               <td colSpan={2} align="right">
@@ -43,11 +42,11 @@ export function GymStoreTable({allState, storeTokenData, refreshBalance, createS
             <tr>
               <td>
                 {/* <Button size='sm' onClick={refreshBalance} active={() => showRefreshBalanceButton(storeTokenData)}>Click to refresh balance</Button> */}
-                <Button size='sm' onClick={refreshBalance} disabled={!allState.storeTokenBalance}>Click to refresh balance</Button>
+                <Button size='sm' onClick={refreshBalance} disabled={!allState.subscriptionTokenBalance}>Click to refresh balance</Button>
               </td>
               <td align="right">
                 <small>
-                  Store Token Balance: <strong>{allState.storeTokenBalance}</strong>
+                  Subscription Token Balance: <strong>{allState.subscriptionTokenBalance}</strong>
                 </small>
               </td>
             </tr>

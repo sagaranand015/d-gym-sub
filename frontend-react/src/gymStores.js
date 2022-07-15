@@ -13,18 +13,25 @@ export default async function GetStoreContract() {
 
     // Then, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
-    const storeToken = new ethers.Contract(
+    const storeContact = new ethers.Contract(
         GymStoreContractAddress.Token,
         GymStoreToken.abi,
         _provider.getSigner(0)
     );
-    return storeToken;
+    return storeContact;
 };
 
 export async function GetStoreTokenDetails(userAddress) {
-    const storeToken = await GetStoreContract();
-    const name = await storeToken.name();
-    const symbol = await storeToken.symbol();
-    const storeTokenBalance = await storeToken.balanceOf(userAddress);
+    const storeContact = await GetStoreContract();
+    const name = await storeContact.name();
+    const symbol = await storeContact.symbol();
+    const storeTokenBalance = await storeContact.balanceOf(userAddress);
     return [name, symbol, storeTokenBalance]
-  };
+};
+
+export async function CreateStoreNFT(city, shortDesc, googleAddr, storeLogo) {
+    const storeContract = await GetStoreContract();
+    const tx = await storeContract.createStore(city, shortDesc, googleAddr, storeLogo, []);
+    await tx.wait();
+    return tx;
+};
