@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract GymStoreNFT is ERC721URIStorage {
-    uint256 storeNumber = 1;
+    uint256 storeNumber = 0;
 
     struct storeDetails {
         uint256 tokenId;

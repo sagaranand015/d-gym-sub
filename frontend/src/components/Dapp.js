@@ -279,6 +279,7 @@ export class Dapp extends React.Component {
 
   async _updateBalance() {
     const balance = await this._token.balanceOf(this.state.selectedAddress);
+    console.log("=========== blance is: ", this.state.selectedAddress, balance);
     this.setState({ balance });
   }
 

@@ -31,6 +31,9 @@
     "solidity-coverage": "^0.7.21"
   },
   "dependencies": {
-    "moralis": "^1.8.1"
+    "ipfs-api": "^26.1.2",
+    "mime": "^3.0.0",
+    "moralis": "^1.8.1",
+    "nft.storage": "^6.4.0"
   }
 }
