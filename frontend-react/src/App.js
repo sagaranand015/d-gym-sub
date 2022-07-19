@@ -7,9 +7,9 @@ import { NoWalletDetected } from "./components/NoWalletDetected";
 import { Loading } from "./components/Loading";
 import GetStoreContract,  { GetStoreTokenDetails, CreateStoreNFT } from "./gymStores";
 import { GymStoreTable } from "./components/GymStore"
+import { SaveToIpfsStorage } from "./nftStorage";
 
-import { TASK_COMPILE_SOLIDITY_RUN_SOLCJS } from "hardhat/builtin-tasks/task-names";
-import { GetStoreSubscriptionContract, GetStoreSubscriptionTokenDetails } from "./storeSubscriptions";
+import { CreateStoreSubscription, GetStoreSubscriptionContract, GetStoreSubscriptionTokenDetails } from "./storeSubscriptions";
 import { StoreSubscriptionTable } from "./components/StoreSubsciption";
 
 export class App extends React.Component {
@@ -110,6 +110,45 @@ export class App extends React.Component {
     await this._refreshStoreTokenBalance();
   }
 
+  async _createStoreSubscriptionNft() {
+
+    var subName = document.getElementById('subName').value;
+    console.log("sub name is: ", subName);
+
+    var subImgFile = document.getElementById('subImgFile').files[0];
+    console.log("====== file is: ", subImgFile);
+
+    var fileObj = {
+      'name': subName,
+      'description': 'Some Random Description for now',
+      'data': subImgFile,
+    }
+    var ipfsNetdata = await SaveToIpfsStorage(fileObj.name, fileObj.description, fileObj.data);
+    console.log("========= ipfshash data is: ", ipfsNetdata);
+
+    var ts = Math.round((new Date()).getTime() / 1000);
+    var mintSubRes = await CreateStoreSubscription(ipfsNetdata, ts)
+    console.log("=========== minted store sub is: ", mintSubRes);
+
+    // var imgData = null;
+    // let img = await fetch('https://picsum.photos/200/300')
+    // let fimgb = Buffer.from(await img.arrayBuffer())
+
+    // var fileObj = {
+    //   'name': 'storeSubImageName',
+    //   'description': 'Description for the image of the store subscription',
+    //   'data': fimgb,
+    // }
+    // console.log("file obj is: ", fileObj);
+
+    // var ts = Math.round((new Date()).getTime() / 1000);
+    // var ipfsNetdata = SaveToIpfsStorage(fileObj.name, fileObj.description, fileObj.data);
+    // console.log("========= ipfshash data is: ", ipfsNetdata);
+
+    // const tx = await CreateStoreNFT("Bangalore", "MyStore02", "http://google.com", "http://image.com");
+    // await this._refreshStoreTokenBalance();
+  }
+
   render() {
 
     // Ethereum wallets inject the window.ethereum object. If it hasn't been
@@ -142,11 +181,13 @@ export class App extends React.Component {
             allState={this.state} 
             storeTokenData={this.state.storeTokenData} 
             refreshBalance={() => this._refreshStoreTokenBalance()}
-            createStoreNFT={() => this._createStoreNft()} />
+            createStoreNFT={() => this._createStoreNft()} 
+        />
 
         <StoreSubscriptionTable 
-            allState={this.state} />
-
+            allState={this.state}
+            createSubscriptionNft={() => this._createStoreSubscriptionNft()} 
+        />
       </div>
     );
 

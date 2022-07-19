@@ -1,8 +1,6 @@
 import Button from 'react-bootstrap/esm/Button';
 import Table from 'react-bootstrap/Table';
 
-// import {GetStoreSubscriptionContract, GetStoreSubscriptionTokenDetails} from '../storeSubscriptions'
-
 export function StoreSubscriptionTable({allState, refreshBalance, createSubscriptionNft}) {
   if(!allState.subscriptionTokenBalance) {
     return (
@@ -10,7 +8,15 @@ export function StoreSubscriptionTable({allState, refreshBalance, createSubscrip
         <h3 className='header' >
           Oops! No Subscription NFT yet. Go create one!
         </h3>
-        <Button variant='primary' size='lg' onClick={createSubscriptionNft} >Create Subscription NFT Now!</Button>
+        <form>
+          <div className="form-group">
+            <input type="text" className="form-control" id="subName" placeholder="Enter Subscription Name" />
+          </div>
+          <div className="form-group">
+            <input type="file" className="custom-file-input" id="subImgFile" />
+          </div>
+          <Button variant='primary' size='lg' onClick={createSubscriptionNft} >Create Subscription NFT Now!</Button>
+        </form>
       </div>
     );
   }

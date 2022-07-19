@@ -29,9 +29,9 @@ export async function GetStoreSubscriptionTokenDetails(userAddress) {
     return [name, symbol, subTokenBalance]
 };
 
-// export async function CreateStoreSubscription(city, shortDesc, googleAddr, storeLogo) {
-//     const storeContract = await GetStoreContract();
-//     const tx = await storeContract.createStore(city, shortDesc, googleAddr, storeLogo, []);
-//     await tx.wait();
-//     return tx;
-// };
+export async function CreateStoreSubscription(ipfsHash, invalidAfter) {
+    const subContract = await GetStoreSubscriptionContract();
+    const tx = await subContract.createSubscription(ipfsHash, invalidAfter);
+    await tx.wait();
+    return tx;
+};
